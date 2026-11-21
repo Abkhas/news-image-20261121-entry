@@ -123,7 +123,7 @@ GRID = [
          src="AP", scene="davao"),
     dict(num=5, tag="ODISHA · WEATHER", place="ODISHA · INDIA",
          head="Cyclone Akvan weakens over Odisha",
-         body="Heavy rain floods towns after landfall; no deaths reported.",
+         body="Heavy rain floods towns as the storm weakens; no deaths reported.",
          big="300,000", big_label="evacuated",
          src="IMD", scene="akvan"),
     dict(num=6, tag="BASRA · DISASTER", place="BASRA · IRAQ",
@@ -138,7 +138,7 @@ GRID = [
          src="Coalition · AFP", scene="riyadh"),
     dict(num=8, tag="HORMUZ · WAR", place="STRAIT OF HORMUZ",
          head="Iran says it downed a US drone",
-         body="Tehran says the MQ-9 is the 58th it has brought down there.",
+         body="Tehran says the MQ-9 is the 58th it has shot down there.",
          big="58", big_label="MQ-9 downed",
          src="IRGC", scene="hormuz"),
     dict(num=9, tag="JUNÍN · QUAKE", place="JUNÍN · PERU",
@@ -158,13 +158,13 @@ GRID = [
          src="OneTurn", scene="brussels"),
     dict(num=12, tag="WARSAW · WAR", place="WARSAW · POLAND",
          head="Russian missiles land in Poland",
-         body="Two missiles came down in the barrage; Tusk protests.",
+         body="Two missiles came down Friday; Tusk calls it deliberate.",
          big="2", big_label="missiles",
          src="Reuters", scene="poland"),
     dict(num=13, tag="MADRID · POLITICS", place="MADRID · SPAIN",
          head="Spain extends bank tax to fund housing",
          body="Sánchez extends the levy to 2027 to pay for housing policies.",
-         big="2027", big_label="tax extended to",
+         big="2027", big_label="levy extended",
          src="Reuters", scene="madrid"),
 ]
 
@@ -205,7 +205,7 @@ REGIONS = [
 STRIP = [
     ("148", "drones overnight"),
     ("200", "nations in talks"),
-    ("6.8", "quake magnitude"),
+    ("6.8", "Banda quake"),
     ("146", "safe after landing"),
     ("300,000", "evacuated"),
     ("4", "killed in Basra"),
@@ -566,9 +566,20 @@ def draw_map(d, x, y, w, h):
     for cont in CONTINENTS:
         pts = [px(lon, lat) for lon, lat in cont]
         d.polygon(pts, fill=(232, 214, 176), outline=(200, 180, 140))
-    # pins
+    # pins (Europe pins are offset with a leader line: at map scale London,
+    # Brussels, Warsaw, Kyiv and Madrid sit within a few pixels of each other)
+    PIN_OFFSETS = {1: (20, 2), 2: (-16, -12), 6: (4, -16), 7: (-14, 10),
+                   8: (16, 8), 10: (-16, -10), 11: (-4, -16),
+                   12: (16, -12), 13: (-14, 6)}
     for n, lat, lon in PINS:
         px0, py0 = px(lon, lat)
+        dx, dy = PIN_OFFSETS.get(n, (0, 0))
+        cx, cy = px0 + dx, py0 + dy
+        if (dx, dy) != (0, 0):
+            d.line([px0, py0, cx, cy], fill=(255, 255, 255), width=1)
+            d.ellipse([px0 - 2, py0 - 2, px0 + 2, py0 + 2],
+                      fill=(255, 255, 255))
+        px0, py0 = cx, cy
         r = 8
         d.ellipse([px0 - r, py0 - r, px0 + r, py0 + r], fill=RED,
                   outline=(255, 255, 255), width=1)
@@ -741,7 +752,7 @@ def build():
     f_dc = font(F_SANS, 11)
     d.text((MX + 8, y + 18),
            "Left out as Friday 20 Nov news: Kyiv barrage (8 killed), "
-           "Akvan's landfall, COP31 draft (144→80), Wall Street's "
+           "Akvan's landfall, COP31 draft (144 to 80), Wall Street's "
            "correction, Shenzhen summit, ICJ ruling, Anthropic IPO, "
            "GTA VI release.", font=f_dc, fill=INK)
     d.text((MX + 8, y + 32),
